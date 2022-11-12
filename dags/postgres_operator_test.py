@@ -3,8 +3,8 @@ from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
-from config.conn import AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL
-from config.args import DEFAULT_ARGS
+from src.config.conn import AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL
+from src.config.args import DEFAULT_ARGS
 
 DAG_ID = "connect_postgres"
 DAG_PSQL = DAG(
@@ -14,7 +14,7 @@ DAG_PSQL = DAG(
     schedule=timedelta(days=1),
     start_date=datetime(2021, 1, 1),
     dagrun_timeout=timedelta(minutes=60),
-    template_searchpath=['/Users/macrent/airflow/src/sql'],
+    template_searchpath=['/Users/macrent/airflow/dags/src/sql'],
     catchup=False,
     tags=['example']
 )
