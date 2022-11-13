@@ -14,7 +14,7 @@ class SlackAlert:
         *Date* : {datetime.today().strftime('%Y-%m-%d, %H:%M:%S')}
         *Task Id* : {context.get('task_instance').task_id},
         *Dag Id*: {context.get('task_instance').dag_id},
-        *Log Url* : {context.get('task_instance').log_url}
+        *Log Url* : <{context.get('task_instance').log_url}|Logs>
         """
         self.client.chat_postMessage(channel=self.slack_channel, text=text)
 
@@ -24,6 +24,6 @@ class SlackAlert:
         *Date* : {datetime.today().strftime('%Y-%m-%d, %H:%M:%S')}
         *Task Id* : {context.get('task_instance').task_id},
         *Dag Id*: {context.get('task_instance').dag_id},
-        *Log Url* : {context.get('task_instance').log_url}
+        *Log Url* : <{context.get('task_instance').log_url}|Logs>
         """
         self.client.chat_postMessage(channel=self.slack_channel, text=text)

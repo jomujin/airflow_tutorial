@@ -18,7 +18,7 @@ class DB_conn:
         self.password = password
         self.database = database
 
-    def getPsypgConn(self):
+    def get_psypg_conn(self):
         try:
             conn = psycopg2.connect(
                 host=self.host,
@@ -32,7 +32,7 @@ class DB_conn:
             print("데이터베이스 접속 실패. db정보를 확인하세요")
         return conn
 
-    def getAlchmyConn(self):
+    def get_alchmy_conn(self):
         con = sqlalchemy.create_engine(
             f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.database}"
         )
