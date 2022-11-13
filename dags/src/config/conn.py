@@ -40,4 +40,5 @@ class DB_conn:
         return con
 
 CONN_AIRFLOW_TUTORIAL = DB_conn('localhost', 5432, 'test', '1234', 'airflow_tutorial')
+CONN_VOS_RAW_DATA = DB_conn('34.64.221.21', 5432, 'dev_mjjo', '1234', 'raw-data')
 AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL = 'postgres_airflow_tutorial'

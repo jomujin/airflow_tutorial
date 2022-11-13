@@ -1,9 +1,4 @@
-from ..config.conn import CONN_AIRFLOW_TUTORIAL
-
-
-def check_existed_table(schema, table):
-    conn = CONN_AIRFLOW_TUTORIAL.getPsypgConn()
-    curr = conn.cursor()
+def check_existed_table(conn, schema, table):
     sql = f"""
     select exists (
     select from
@@ -13,5 +8,5 @@ def check_existed_table(schema, table):
         tablename  = '{table}'
     )
     """
-    curr.execute(sql)
-    return curr.fetchone()[0]
+    res = conn.execute(sql)
+    return res.fetchone()[0]
