@@ -1,14 +1,21 @@
 import airflow
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.slack.operators.slack import SlackAPIPostOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
-from src.config.conn import AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL
 from src.config.args import DEFAULT_ARGS
 from src.py.check_existed_table import check_existed_table
+from src.config.conn import CONN_AIRFLOW_TUTORIAL
+from src.py.slack_alert import SlackAlert
 
 
 DAG_ID = "test_pythonoperator"
+conn = CONN_AIRFLOW_TUTORIAL.getAlchmyConn()
+slack = SlackAlert(
+    channel='#airflow-slackoperator-test',
+    token='xoxb-4356051306278-4356068062918-XiKx8oMkAjhrlF4x3B8Z3M4Y'
+)
 DAG_PY = DAG(
     dag_id=DAG_ID,
     default_args=DEFAULT_ARGS,
@@ -16,18 +23,21 @@ DAG_PY = DAG(
     schedule=timedelta(days=1),
     start_date=datetime(2021, 1, 1),
     dagrun_timeout=timedelta(minutes=60),
-    # template_searchpath=['/Users/macrent/airflow/src/py'],
     catchup=False,
-    tags=['example']
+    tags=['example'],
+    on_success_callback=slack.slack_success_alert,
+    on_failure_callback=slack.slack_failure_alert
 )
 
 create_table = PythonOperator(
-    task_id = "check_existed_table_py",
+    task_id="check_existed_table_py",
     python_callable=check_existed_table,
     op_kwargs={
-        'schema':'kb',
-        'table':'test'
+        'conn': conn,
+        'schema': 'kb',
+        'table': 'test'
     },
+    trigger_rule="all_done",
     dag = DAG_PY
 )
 
