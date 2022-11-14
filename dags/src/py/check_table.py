@@ -1,3 +1,13 @@
+def get_correct_date(date):
+    if date[:2] == '20':
+        return date
+    else:
+        date_arr = date.split('_')
+        for i, s in enumerate(date_arr):
+            if  s.startswith('20'):
+                return '_'.join(date_arr[i:])
+    return date
+
 def check_existed_table(conn, schema, table):
     sql = f"""
     select exists (
@@ -44,10 +54,11 @@ def get_recent_partitiondate(conn, schema, table):
         new_mth_list = list()
         for mth in mth_list:
             if check_is_table_rows(conn, schema, table, mth) == True:
+                mth = get_correct_date(mth)
                 new_mth_list.append(mth)
         return new_mth_list[0]
     else:
-        return mth_list[0]
+        return get_correct_date(mth_list[0])
 
 def check_is_satisfied_condition(
     conn, 
@@ -59,8 +70,17 @@ def check_is_satisfied_condition(
     table_1_rpd = get_recent_partitiondate(conn, schema_1, table_1)
     table_2_rpd = get_recent_partitiondate(conn, schema_2, table_2)
     if table_1_rpd == table_2_rpd:
-        return False
+        return (
+            False, 
+            None
+        )
     table_1_pd_list = get_partition_date_all(conn, schema_1, table_1)
-    if table_1_pd_list[-2] == table_2_rpd:
-        return True
-    return False
+    if table_1_pd_list[1] == table_2_rpd:
+        return (
+            True, 
+            table_1_rpd
+        )
+    return (
+            False, 
+            None
+        )
