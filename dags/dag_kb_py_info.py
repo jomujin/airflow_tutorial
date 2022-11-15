@@ -19,6 +19,9 @@ from src.py.helper.tb_download_helper import (
 from src.py.helper.xcom_helper import (
     return_pull_xcom
 )
+from src.py.creator.kb_py_info import (
+    create_kb_py_info_table
+)
 
 
 DAG_ID = "create_kb_py_info"
@@ -72,6 +75,10 @@ def return_kb_base_wk(conn, schema, table, **context):
 def pull_kb_base_wk_and_download_sub_table(db, schema, table, **context):
     kb_base_wk = return_pull_xcom(task_ids='return_kb_base_wk_task', **context)
     download_sub_table(db, schema, table, kb_base_wk)
+
+def pull_kb_base_wk_and_create_kb_py_info_table(**context):
+    kb_base_wk = return_pull_xcom(task_ids='return_kb_base_wk_task', **context)
+    create_kb_py_info_table(kb_base_wk)
 
 def stop_func():
     return 'stop'
@@ -155,6 +162,14 @@ download_kb_complex_pnu_map_op = PythonOperator(
     dag=DAG_PY
 )
 
+create_kb_py_info_op = PythonOperator(
+    task_id='create_kb_py_info_task',
+    python_callable=pull_kb_base_wk_and_create_kb_py_info_table,
+    trigger_rule="all_done",
+    provide_context=True,
+    dag=DAG_PY
+)
+
 stop_op = PythonOperator(
     task_id='test_stop_task',
     python_callable=stop_func,
@@ -175,5 +190,5 @@ return_kb_base_wk_op >> [
     download_kb_peongtype_op,
     download_kb_price_op,
     download_kb_complex_pnu_map_op
-] >> finish_op
+] >> create_kb_py_info_op >> finish_op
 stop_op >> finish_op
