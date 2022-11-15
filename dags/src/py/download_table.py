@@ -43,9 +43,7 @@ def cacheTableToCSVByQuery(db, table, sql):
         with open(cache_file, "wb") as f:
             runApg(apg_copy_from_query_to_csv(db, table, sql, f))
 
-def download_sub_table(db, schema, table):
-    conn = db.get_alchmy_conn()
-    kb_base_wk = get_recent_partitiondate(conn, schema, table)
+def download_sub_table(db, schema, table, kb_base_wk):
     cacheTableToCSV(
         db=db,
         schema=schema,

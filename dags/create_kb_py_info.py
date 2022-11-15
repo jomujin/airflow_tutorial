@@ -10,10 +10,14 @@ from src.config.conn import CONN_AIRFLOW_TUTORIAL
 from src.py.slack_alert import SlackAlert
 from src.py.check_table import (
     check_existed_table,
-    check_is_satisfied_condition
+    check_is_satisfied_condition,
+    get_recent_partitiondate
 )
 from src.py.download_table import (
     download_sub_table
+)
+from src.py.xcom import (
+    return_pull_xcom
 )
 
 
@@ -56,13 +60,18 @@ def branch_check_is_satisfied_condition_func(**kwargs):
     # 다음에 실행할 task_id 를 반환한다.
     if res: # 업데이트 조건을 만족하면 True
         if branch_check_existed_all_sub_table_func(kb_base_wk): # 서브 테이블 유무 만족하면 True
-            return 'test_continue_task'
+            return 'return_kb_base_wk_task'
         return 'test_stop_task' # 서브 테이블 유무 불만족하면 False
     else: # 업데이트 조건을 불만족하면 False
         return 'test_stop_task'
 
-def continue_func(**kwargs):
-    return 'continue'
+def return_kb_base_wk(conn, schema, table, **context):
+    kb_base_wk = get_recent_partitiondate(conn, schema, table)
+    return kb_base_wk
+
+def pull_kb_base_wk_and_download_sub_table(db, schema, table, **context):
+    kb_base_wk = return_pull_xcom(task_ids='return_kb_base_wk_task', **context)
+    download_sub_table(db, schema, table, kb_base_wk)
 
 def stop_func():
     return 'stop'
@@ -82,58 +91,67 @@ branch_check_condition_op = BranchPythonOperator(
     dag = DAG_PY
 )
 
+return_kb_base_wk_op = PythonOperator(
+    task_id='return_kb_base_wk_task',
+    python_callable=return_kb_base_wk,
+    op_kwargs={
+        'conn': conn,
+        'schema': 'kb',
+        'table': 'kb_price'
+    },
+    provide_context=True,
+    dag=DAG_PY
+)
+
 download_kb_complex_op = PythonOperator(
     task_id='download_kb_complex_task',
-    python_callable=download_sub_table,
+    python_callable=pull_kb_base_wk_and_download_sub_table,
     op_kwargs={
         'db': CONN_AIRFLOW_TUTORIAL,
         'schema': 'kb',
         'table': 'kb_complex',
     },
     trigger_rule="all_done",
+    provide_context=True,
     dag=DAG_PY
 )
 
 download_kb_peongtype_op = PythonOperator(
     task_id='download_kb_peongtype_task',
-    python_callable=download_sub_table,
+    python_callable=pull_kb_base_wk_and_download_sub_table,
     op_kwargs={
         'db': CONN_AIRFLOW_TUTORIAL,
         'schema': 'kb',
         'table': 'kb_peongtype',
     },
     trigger_rule="all_done",
+    provide_context=True,
     dag=DAG_PY
 )
 
 download_kb_price_op = PythonOperator(
     task_id='download_kb_price_task',
-    python_callable=download_sub_table,
+    python_callable=pull_kb_base_wk_and_download_sub_table,
     op_kwargs={
         'db': CONN_AIRFLOW_TUTORIAL,
         'schema': 'kb',
         'table': 'kb_price',
     },
     trigger_rule="all_done",
+    provide_context=True,
     dag=DAG_PY
 )
 
 download_kb_complex_pnu_map_op = PythonOperator(
     task_id='download_kb_complex_pnu_map_task',
-    python_callable=download_sub_table,
+    python_callable=pull_kb_base_wk_and_download_sub_table,
     op_kwargs={
         'db': CONN_AIRFLOW_TUTORIAL,
         'schema': 'kb',
         'table': 'kb_complex_pnu_map',
     },
     trigger_rule="all_done",
-    dag=DAG_PY
-)
-
-
-continue_op = PythonOperator(
-    task_id='test_continue_task',
-    python_callable=continue_func,
+    provide_context=True,
     dag=DAG_PY
 )
 
@@ -149,13 +167,13 @@ finish_op = EmptyOperator(
 )
 
 branch_check_condition_op >> [
-    continue_op, 
+    return_kb_base_wk_op, 
     stop_op
 ]
-continue_op >> [
+return_kb_base_wk_op >> [
     download_kb_complex_op, 
     download_kb_peongtype_op,
     download_kb_price_op,
     download_kb_complex_pnu_map_op
 ] >> finish_op
-
+stop_op >> finish_op
