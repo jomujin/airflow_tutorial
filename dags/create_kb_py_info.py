@@ -7,16 +7,16 @@ from airflow.operators.python import (
 from datetime import datetime, timedelta
 from src.config.args import DEFAULT_ARGS
 from src.config.conn import CONN_AIRFLOW_TUTORIAL
-from src.py.slack_alert import SlackAlert
-from src.py.check_table import (
+from src.py.helper.slack_helper import SlackAlert
+from src.py.helper.tb_check_helper import (
     check_existed_table,
     check_is_satisfied_condition,
     get_recent_partitiondate
 )
-from src.py.download_table import (
+from src.py.helper.tb_download_helper import (
     download_sub_table
 )
-from src.py.xcom import (
+from src.py.helper.xcom_helper import (
     return_pull_xcom
 )
 

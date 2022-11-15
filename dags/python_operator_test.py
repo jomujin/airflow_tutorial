@@ -5,9 +5,9 @@ from airflow.providers.slack.operators.slack import SlackAPIPostOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
 from src.config.args import DEFAULT_ARGS
-from src.py.check_table import check_existed_table
+from src.py.helper.tb_check_helper import check_existed_table
 from src.config.conn import CONN_AIRFLOW_TUTORIAL
-from src.py.slack_alert import SlackAlert
+from src.py.helper.slack_helper import SlackAlert
 
 
 DAG_ID = "test_pythonoperator"

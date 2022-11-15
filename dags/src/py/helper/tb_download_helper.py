@@ -1,7 +1,6 @@
 import os
 import asyncio
-from ..config.condition import DB_DIR
-from ..py.check_table import get_recent_partitiondate
+from ...config.condition import DB_DIR
 
 
 async def apg_copy_table_to_csv(db, schema, table, f=None):
