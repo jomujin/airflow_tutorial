@@ -233,3 +233,4 @@ licenses/LICENSES-ui.txt
 
 /config/conn.py
 *.ipynb
+/db
