@@ -10,15 +10,17 @@ from src.config.conn import CONN_AIRFLOW_TUTORIAL
 from src.py.slack_alert import SlackAlert
 from src.py.check_table import (
     check_existed_table,
-    get_recent_partitiondate,
     check_is_satisfied_condition
+)
+from src.py.download_table import (
+    download_sub_table
 )
 
 
 DAG_ID = "create_kb_py_info"
 SLACK = SlackAlert(
     channel='#airflow-slackoperator-test',
-    token='xoxb-4356051306278-4356068062918-XiKx8oMkAjhrlF4x3B8Z3M4Y'
+    token='xoxb-4356051306278-4356068062918-PoL2IMASKfSMps7tTwHw3Jr0'
 )
 DAG_PY = DAG(
     dag_id=DAG_ID,
@@ -59,7 +61,7 @@ def branch_check_is_satisfied_condition_func(**kwargs):
     else: # 업데이트 조건을 불만족하면 False
         return 'test_stop_task'
 
-def continue_func():
+def continue_func(**kwargs):
     return 'continue'
 
 def stop_func():
@@ -80,19 +82,80 @@ branch_check_condition_op = BranchPythonOperator(
     dag = DAG_PY
 )
 
+download_kb_complex_op = PythonOperator(
+    task_id='download_kb_complex_task',
+    python_callable=download_sub_table,
+    op_kwargs={
+        'db': CONN_AIRFLOW_TUTORIAL,
+        'schema': 'kb',
+        'table': 'kb_complex',
+    },
+    trigger_rule="all_done",
+    dag=DAG_PY
+)
+
+download_kb_peongtype_op = PythonOperator(
+    task_id='download_kb_peongtype_task',
+    python_callable=download_sub_table,
+    op_kwargs={
+        'db': CONN_AIRFLOW_TUTORIAL,
+        'schema': 'kb',
+        'table': 'kb_peongtype',
+    },
+    trigger_rule="all_done",
+    dag=DAG_PY
+)
+
+download_kb_price_op = PythonOperator(
+    task_id='download_kb_price_task',
+    python_callable=download_sub_table,
+    op_kwargs={
+        'db': CONN_AIRFLOW_TUTORIAL,
+        'schema': 'kb',
+        'table': 'kb_price',
+    },
+    trigger_rule="all_done",
+    dag=DAG_PY
+)
+
+download_kb_complex_pnu_map_op = PythonOperator(
+    task_id='download_kb_complex_pnu_map_task',
+    python_callable=download_sub_table,
+    op_kwargs={
+        'db': CONN_AIRFLOW_TUTORIAL,
+        'schema': 'kb',
+        'table': 'kb_complex_pnu_map',
+    },
+    trigger_rule="all_done",
+    dag=DAG_PY
+)
+
+
 continue_op = PythonOperator(
     task_id='test_continue_task',
     python_callable=continue_func,
-    provide_context=True,
     dag=DAG_PY
 )
 
 stop_op = PythonOperator(
     task_id='test_stop_task',
     python_callable=stop_func,
-    provide_context=True,
     dag=DAG_PY
 )
 
-branch_check_condition_op >> [continue_op, stop_op]
+finish_op = EmptyOperator(
+    task_id='finish_task',
+    dag=DAG_PY
+)
+
+branch_check_condition_op >> [
+    continue_op, 
+    stop_op
+]
+continue_op >> [
+    download_kb_complex_op, 
+    download_kb_peongtype_op,
+    download_kb_price_op,
+    download_kb_complex_pnu_map_op
+] >> finish_op
 
