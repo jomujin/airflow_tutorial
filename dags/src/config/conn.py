@@ -1,3 +1,4 @@
+import asyncpg
 import psycopg2
 import sqlalchemy
 
@@ -38,6 +39,15 @@ class DB_conn:
         )
         con = con.execution_options(isolation_level="AUTOCOMMIT")
         return con
+
+    async def get_apg_conn(self):
+        return await asyncpg.connect(
+            user=self.user,
+            password=self.password,
+            database=self.database,
+            host=self.host,
+            port=self.port,
+        )
 
 CONN_AIRFLOW_TUTORIAL = DB_conn('localhost', 5432, 'test', '1234', 'airflow_tutorial')
 CONN_VOS_RAW_DATA = DB_conn('34.64.221.21', 5432, 'dev_mjjo', '1234', 'raw-data')
