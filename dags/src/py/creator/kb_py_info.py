@@ -5,9 +5,9 @@ from ...config.condition import (
     DB_PATH
 )
 from ...config.condition import (
-    KB_RAW_COMPLEX,
-    KB_RAW_PYTYPE,
-    KB_RAW_PRICE,
+    KB_RAW_COMPLEX_TABLE,
+    KB_RAW_PYTYPE_TABLE,
+    KB_RAW_PRICE_TABLE,
     KB_COMPLEX_PNU_MAP_TABLE,
     KB_PY_INFO_TABLE
 )
@@ -24,17 +24,17 @@ def create_kb_py_info_table(kb_base_wk):
     table_name = KB_PY_INFO_TABLE
 
     kb_raw_complex = pd.read_csv(
-        f'{DB_PATH}/{KB_RAW_COMPLEX}_{kb_base_wk}.csv',
+        f'{DB_PATH}/{KB_RAW_COMPLEX_TABLE}_{kb_base_wk}.csv',
         encoding='utf-8'
     )
 
     kb_raw_peongtype = pd.read_csv(
-        f'{DB_PATH}/{KB_RAW_PYTYPE}_{kb_base_wk}.csv',
+        f'{DB_PATH}/{KB_RAW_PYTYPE_TABLE}_{kb_base_wk}.csv',
         encoding='utf-8'
     )
 
     kb_raw_price = pd.read_csv(
-        f'{DB_PATH}/{KB_RAW_PRICE}_{kb_base_wk}.csv',
+        f'{DB_PATH}/{KB_RAW_PRICE_TABLE}_{kb_base_wk}.csv',
         encoding='utf-8'
     )
 
@@ -44,9 +44,9 @@ def create_kb_py_info_table(kb_base_wk):
     )
 
     print(f"""Succeed loading sub table, table name : 
-        {KB_RAW_COMPLEX}_{kb_base_wk},
-        {KB_RAW_PYTYPE}_{kb_base_wk},
-        {KB_RAW_PRICE}_{kb_base_wk},
+        {KB_RAW_COMPLEX_TABLE}_{kb_base_wk},
+        {KB_RAW_PYTYPE_TABLE}_{kb_base_wk},
+        {KB_RAW_PRICE_TABLE}_{kb_base_wk},
         {KB_COMPLEX_PNU_MAP_TABLE}_{kb_base_wk},
         """)
         
