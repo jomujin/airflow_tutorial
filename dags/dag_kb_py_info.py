@@ -75,9 +75,9 @@ def branch_check_is_satisfied_condition_func(**kwargs):
     if res: # 업데이트 조건을 만족하면 True
         if branch_check_existed_all_sub_table_func(kb_base_wk): # 서브 테이블 유무 만족하면 True
             return 'return_kb_base_wk_task'
-        return 'test_stop_task' # 서브 테이블 유무 불만족하면 False
+        return 'skip_task' # 서브 테이블 유무 불만족하면 False
     else: # 업데이트 조건을 불만족하면 False
-        return 'test_stop_task'
+        return 'skip_task'
 
 def return_kb_base_wk(conn, schema, table, **context):
     kb_base_wk = get_recent_partitiondate(conn, schema, table)
@@ -95,8 +95,18 @@ def pull_kb_base_wk_and_update_kb_py_info_table(conn, table, **context):
     kb_base_wk = return_pull_xcom(task_ids='return_kb_base_wk_task', **context)
     update_kb_py_info(conn, table, kb_base_wk)
 
-def stop_func():
-    return 'stop'
+def skip_func():
+    return 'skip'
+
+def check_branch(**context):
+    return None
+
+def finish_func(**context):
+    res = return_pull_xcom(task_ids='check_is_satisfied_condition_task', **context)
+    if res == 'skip_task':
+        return 'Stoped Update Due to Unsatisfied Condition'
+    else:
+        return 'Succeded Update Kb_py_info Table'
 
 branch_check_condition_op = BranchPythonOperator(
     task_id="check_is_satisfied_condition_task",
@@ -108,7 +118,6 @@ branch_check_condition_op = BranchPythonOperator(
         'schema_2': KB_SCHEMA,
         'table_2': KB_PY_INFO_TABLE
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag = DAG_PY
 )
@@ -133,7 +142,6 @@ download_kb_complex_op = PythonOperator(
         'schema': KB_SCHEMA,
         'table': KB_RAW_COMPLEX_TABLE,
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
@@ -146,7 +154,6 @@ download_kb_peongtype_op = PythonOperator(
         'schema': KB_SCHEMA,
         'table': KB_RAW_PYTYPE_TABLE,
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
@@ -159,7 +166,6 @@ download_kb_price_op = PythonOperator(
         'schema': KB_SCHEMA,
         'table': KB_RAW_PRICE_TABLE,
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
@@ -172,7 +178,6 @@ download_kb_complex_pnu_map_op = PythonOperator(
         'schema': KB_SCHEMA,
         'table': KB_COMPLEX_PNU_MAP_TABLE,
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
@@ -180,7 +185,6 @@ download_kb_complex_pnu_map_op = PythonOperator(
 create_kb_py_info_op = PythonOperator(
     task_id='create_kb_py_info_task',
     python_callable=pull_kb_base_wk_and_create_kb_py_info_table,
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
@@ -192,30 +196,42 @@ update_kb_py_info_op = PythonOperator(
         'conn': CONN_AIRFLOW_TUTORIAL.get_alchmy_conn(),
         'table': KB_PY_INFO_TABLE
     },
-    trigger_rule="all_done",
     provide_context=True,
     dag=DAG_PY
 )
 
-stop_op = PythonOperator(
-    task_id='test_stop_task',
-    python_callable=stop_func,
+skip_op = PythonOperator(
+    task_id='skip_task',
+    python_callable=skip_func,
+    provide_context=True,
     dag=DAG_PY
 )
 
-finish_op = EmptyOperator(
+check_branch_op = PythonOperator(
+    task_id='check_branch_task',
+    python_callable=check_branch,
+    trigger_rule="one_success", # 앞 작업 성공시, 분기되어 있으므로 둘 중 하나만 성공해도 진행됨
+    provide_context=True,
+    dag=DAG_PY
+)
+
+finish_op = PythonOperator(
     task_id='finish_task',
+    python_callable=finish_func,
+    trigger_rule="all_done", # 작업 성공 여부에 관계없이 모두 작동한 경우
+    provide_context=True,
     dag=DAG_PY
 )
 
 branch_check_condition_op >> [
     return_kb_base_wk_op, 
-    stop_op
+    skip_op
 ]
 return_kb_base_wk_op >> [
     download_kb_complex_op, 
     download_kb_peongtype_op,
     download_kb_price_op,
     download_kb_complex_pnu_map_op
-] >> create_kb_py_info_op >> update_kb_py_info_op >> finish_op
-stop_op >> finish_op
+] >> create_kb_py_info_op >> update_kb_py_info_op >> check_branch_op
+skip_op >> check_branch_op
+check_branch_op >> finish_op
