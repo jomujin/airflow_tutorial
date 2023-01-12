@@ -8,12 +8,15 @@ from src.config.args import DEFAULT_ARGS
 from src.py.helper.tb_check_helper import check_existed_table
 from src.config.conn import CONN_AIRFLOW_TUTORIAL
 from src.py.helper.slack_helper import SlackAlert
-
+from cond import (
+    SLACK_CHANNEL,
+    SLACK_TOKEN
+)
 
 DAG_ID = "test_pythonoperator"
 SLACK = SlackAlert(
-    channel='#airflow-slackoperator-test',
-    token='xoxb-4356051306278-4356068062918-XiKx8oMkAjhrlF4x3B8Z3M4Y'
+    channel=SLACK_CHANNEL,
+    token=SLACK_TOKEN
 )
 DAG_PY = DAG(
     dag_id=DAG_ID,
