@@ -1,6 +1,10 @@
 import asyncpg
 import psycopg2
 import sqlalchemy
+from .condition import (
+    DB_VOS_RAW_DATA,
+    DB_AIRFLOW_TUTORIAL
+)
 
 
 class DB_conn:
@@ -49,6 +53,18 @@ class DB_conn:
             port=self.port,
         )
 
-CONN_AIRFLOW_TUTORIAL = DB_conn('localhost', 5432, 'test', '1234', 'airflow_tutorial')
-CONN_VOS_RAW_DATA = DB_conn('34.64.221.21', 5432, 'dev_mjjo', '1234', 'raw-data')
-AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL = 'postgres_airflow_tutorial'
+CONN_AIRFLOW_TUTORIAL = DB_conn(
+    DB_AIRFLOW_TUTORIAL.get('HOST'),
+    DB_AIRFLOW_TUTORIAL.get('PORT'),
+    DB_AIRFLOW_TUTORIAL.get('USER'),
+    DB_AIRFLOW_TUTORIAL.get('PASSWORD'),
+    DB_AIRFLOW_TUTORIAL.get('DBNAME')
+)
+
+CONN_VOS_RAW_DATA = DB_conn(
+    DB_VOS_RAW_DATA.get('HOST'),
+    DB_VOS_RAW_DATA.get('PORT'),
+    DB_VOS_RAW_DATA.get('USER'),
+    DB_VOS_RAW_DATA.get('PASSWORD'),
+    DB_VOS_RAW_DATA.get('DBNAME')
+)

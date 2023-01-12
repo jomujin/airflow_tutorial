@@ -15,28 +15,27 @@ class SlackAlert:
         task_id = context.get('task_instance').task_id
         dag_id = context.get('task_instance').dag_id
         log_url = context.get('task_instance').log_url
-        result_msg = return_pull_xcom(task_ids=f'{task_id}', **context)
+        # result_msg = return_pull_xcom(task_ids=f'{task_id}', **context)
         text = f"""
         *Alert* : Success!
         *Date* : {datetime.today().strftime('%Y-%m-%d, %H:%M:%S')}
         *Task Id* : {task_id},
         *Dag Id*: {dag_id},
         *Log Url* : <{log_url}|Logs>
-        *Result Msg* : {result_msg}
         """
+        # *Result Msg* : {result_msg}
         self.client.chat_postMessage(channel=self.slack_channel, text=text)
 
     def slack_failure_alert(self, context):
         task_id = context.get('task_instance').task_id
         dag_id = context.get('task_instance').dag_id
         log_url = context.get('task_instance').log_url
-        result_msg = return_pull_xcom(task_ids=f'{task_id}', **context)
+        # result_msg = return_pull_xcom(task_ids=f'{task_id}', **context)
         text = f"""
         *Alert* : Fail!
         *Date* : {datetime.today().strftime('%Y-%m-%d, %H:%M:%S')}
         *Task Id* : {task_id},
         *Dag Id*: {dag_id},
         *Log Url* : <{log_url}|Logs>
-        *Result Msg* : {result_msg}
         """
         self.client.chat_postMessage(channel=self.slack_channel, text=text)

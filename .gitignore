@@ -231,6 +231,6 @@ licenses/LICENSES-ui.txt
 *.py.*.html
 *.py.*.bin
 
-/config/conn.py
+/config/cond.py
 *.ipynb
 /db

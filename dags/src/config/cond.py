@@ -1,6 +1,7 @@
 import os
 import sqlalchemy
 
+EMAIL = 'mj.jo@valueofspace.com'
 
 PATH = os.getcwd()
 DB_DIR = "db" 
@@ -46,3 +47,21 @@ KB_PY_INFO_SQL_DTYPES = {
     'kb_is_not_prov' : sqlalchemy.types.Integer(),
     'de_base_wk' : sqlalchemy.types.Text()
 }
+
+DB_AIRFLOW_TUTORIAL = {
+    'HOST' : 'localhost', 
+    'PORT' : 5432, 
+    'USER' : 'test', 
+    'PASSWORD' : '1234', 
+    'DBNAME' : 'airflow_tutorial'
+}
+
+DB_VOS_RAW_DATA = {
+    'HOST' : '34.64.221.21', 
+    'PORT' : 5432, 
+    'USER' : 'dev_mjjo', 
+    'PASSWORD' : '1234', 
+    'DBNAME' : 'raw-data'
+}
+
+AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL = 'postgres_airflow_tutorial'

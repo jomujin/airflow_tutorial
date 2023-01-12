@@ -15,7 +15,9 @@ from src.config.condition import (
     KB_COMPLEX_PNU_MAP_TABLE,
     KB_PY_INFO_TABLE
 )
-from src.py.helper.slack_helper import SlackAlert
+from src.py.helper.slack_helper import (
+    SlackAlert
+)
 from src.py.helper.tb_check_helper import (
     check_existed_table,
     check_is_satisfied_condition,
@@ -46,8 +48,8 @@ DAG_PY = DAG(
     description='use case of python operator in airflow',
     schedule=timedelta(days=1),
     start_date=datetime(2021, 1, 1),
-    dagrun_timeout=timedelta(minutes=60),
-    catchup=False,
+    dagrun_timeout=timedelta(seconds=30),
+    catchup=False, # 정해진 시간에 실행되지 못한 DAG를 늦게라도 실행하는 것
     tags=['example'],
     on_success_callback=SLACK.slack_success_alert,
     on_failure_callback=SLACK.slack_failure_alert
