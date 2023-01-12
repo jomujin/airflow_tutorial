@@ -7,7 +7,7 @@ from airflow.operators.python import (
 from datetime import datetime, timedelta
 from src.config.args import DEFAULT_ARGS
 from src.config.conn import CONN_AIRFLOW_TUTORIAL
-from src.config.condition import (
+from cond import (
     KB_SCHEMA,
     KB_RAW_COMPLEX_TABLE,
     KB_RAW_PYTYPE_TABLE,

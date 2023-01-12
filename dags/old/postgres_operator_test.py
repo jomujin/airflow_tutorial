@@ -3,7 +3,7 @@ from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
-from src.config.conn import AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL
+from cond import AIRFLOW_CONN_POSTGRES_AIRFLOW_TUTORIAL
 from src.config.args import DEFAULT_ARGS
 
 DAG_ID = "connect_postgres"

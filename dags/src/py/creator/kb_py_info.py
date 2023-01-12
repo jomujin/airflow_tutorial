@@ -1,10 +1,8 @@
 import gc
 import pandas as pd
 import numpy as np
-from ...config.condition import (
-    DB_PATH
-)
-from ...config.condition import (
+from cond import (
+    DB_PATH,
     KB_RAW_COMPLEX_TABLE,
     KB_RAW_PYTYPE_TABLE,
     KB_RAW_PRICE_TABLE,
