@@ -13,7 +13,9 @@ from cond import (
     KB_RAW_PYTYPE_TABLE,
     KB_RAW_PRICE_TABLE,
     KB_COMPLEX_PNU_MAP_TABLE,
-    KB_PY_INFO_TABLE
+    KB_PY_INFO_TABLE,
+    SLACK_CHANNEL,
+    SLACK_TOKEN
 )
 from src.py.helper.slack_helper import (
     SlackAlert
@@ -39,8 +41,8 @@ from src.py.helper.tb_upload_helper import (
 
 DAG_ID = "create_kb_py_info"
 SLACK = SlackAlert(
-    channel='#airflow-slackoperator-test',
-    token='xoxb-4356051306278-4356068062918-PoL2IMASKfSMps7tTwHw3Jr0'
+    channel=SLACK_CHANNEL,
+    token=SLACK_TOKEN
 )
 DAG_PY = DAG(
     dag_id=DAG_ID,
