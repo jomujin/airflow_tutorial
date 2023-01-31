@@ -1,6 +1,6 @@
 import os
 import asyncio
-from cond import DB_DIR
+from ....cond.condition import DB_DIR
 
 
 async def apg_copy_table_to_csv(db, schema, table, f=None):

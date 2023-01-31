@@ -234,3 +234,4 @@ licenses/LICENSES-ui.txt
 /cond.py
 *.ipynb
 /db
+.env

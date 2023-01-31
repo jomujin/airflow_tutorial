@@ -1,7 +1,7 @@
 import gc
 import pandas as pd
 import numpy as np
-from cond import (
+from ....cond.condition import (
     DB_PATH,
     KB_RAW_COMPLEX_TABLE,
     KB_RAW_PYTYPE_TABLE,

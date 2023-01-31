@@ -8,10 +8,11 @@ from src.config.args import DEFAULT_ARGS
 from src.py.helper.tb_check_helper import check_existed_table
 from src.config.conn import CONN_AIRFLOW_TUTORIAL
 from src.py.helper.slack_helper import SlackAlert
-from cond import (
+from cond.condition import (
     SLACK_CHANNEL,
     SLACK_TOKEN
 )
+
 
 DAG_ID = "test_pythonoperator"
 SLACK = SlackAlert(

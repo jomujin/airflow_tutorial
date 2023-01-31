@@ -1,5 +1,5 @@
 from datetime import timedelta
-from cond import EMAIL
+from ...cond.condition import EMAIL
 
 
 DEFAULT_ARGS = {

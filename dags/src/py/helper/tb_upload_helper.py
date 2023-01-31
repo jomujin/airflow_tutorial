@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from cond import (
+from ....cond.condition import (
     DB_PATH,
     KB_SCHEMA,
     KB_PY_INFO_TABLE,

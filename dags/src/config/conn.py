@@ -1,7 +1,7 @@
 import asyncpg
 import psycopg2
 import sqlalchemy
-from cond import (
+from ...cond.condition import (
     DB_VOS_RAW_DATA,
     DB_AIRFLOW_TUTORIAL
 )
